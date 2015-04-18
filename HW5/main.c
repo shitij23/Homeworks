@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   main.c
  * Author: shitijrastogi
  *
@@ -117,7 +117,7 @@ static const char ASCII[96][5] = {
 ,{0x07, 0x08, 0x70, 0x08, 0x07} // 59 Y
 ,{0x61, 0x51, 0x49, 0x45, 0x43} // 5a Z
 ,{0x00, 0x7f, 0x41, 0x41, 0x00} // 5b [
-,{0x02, 0x04, 0x08, 0x10, 0x20} // 5c ¥
+,{0x02, 0x04, 0x08, 0x10, 0x20} // 5c ?
 ,{0x00, 0x41, 0x41, 0x7f, 0x00} // 5d ]
 ,{0x04, 0x02, 0x01, 0x02, 0x04} // 5e ^
 ,{0x40, 0x40, 0x40, 0x40, 0x40} // 5f _
@@ -229,7 +229,7 @@ display_init();
     //display_pixel_set(0,30,1);
 
    // display_draw();
-    
+
 char message[20];
 
 //sprintf(message, "Hello World 1337!") - for hello world open this and close next line;
@@ -245,7 +245,8 @@ int a;
 int z;
 int startr=0;
 int startc=0;
-int x;
+int x, x_acc, y_acc, xa, ya;
+
 
     while (1) {
         i=0;
@@ -272,11 +273,65 @@ acc_read_register(OUT_X_L_M, (unsigned char *) mags, 6);
 
 acc_read_register(TEMP_OUT_L, (unsigned char *) &temp, 2);
 
-        sprintf(message,"x: %d y: %d z: %d \r\n a: %d b: %d c: %d \r\n t %d", accels[0],accels[1],accels[2],mags[0],mags[1],mags[2],temp);
 
-        while(message[i]){
+x_acc =(int) ((float) accels[0]*64/16000);
 
-    for(column=0;column<5;column++){
+y_acc =(int) ((float) accels[1]*32/16000);
+
+display_clear();
+
+if(x_acc>64){x_acc = 64;};
+if(x_acc<-64){x_acc = -64;};
+if(y_acc>32){y_acc = 32;};
+if(y_acc<-32){y_acc = -32;};
+
+if(x_acc>=0){
+
+
+    for(ya=31; ya<35; ya++){
+    for (xa=64-x_acc; xa<64; xa++){
+                display_pixel_set(ya,xa,0b0001);
+    }
+    }
+}
+
+if(x_acc<0){
+
+
+    for(ya=31; ya<35; ya++){
+    for (xa=64; xa<64-x_acc; xa++){
+                display_pixel_set(ya,xa,0b0001);
+    }
+    }
+}
+
+if(y_acc>=0){
+
+    for(xa=62; xa<67; xa++){
+    for(ya=32-y_acc; ya<=32; ya++){
+      display_pixel_set(ya,xa,0b0001);
+    }
+    }
+
+}
+
+if(y_acc<0){
+
+    for(xa=62; xa<67; xa++){
+    for(ya=32; ya<=32-y_acc; ya++){
+      display_pixel_set(ya,xa,0b0001);
+    }
+    }
+
+}
+
+
+
+//sprintf(message,"x: %d y: %d z: %d \r\n a: %d b: %d c: %d \r\n t %d", accels[0],accels[1],accels[2],mags[0],mags[1],mags[2],temp);
+
+        /* while(message[i]){
+
+     for(column=0;column<5;column++){
         tablerowaddress=message[i]-0x20;
         value=ASCII[tablerowaddress][column];//returns a 5x1 matrix
 
@@ -288,7 +343,7 @@ acc_read_register(TEMP_OUT_L, (unsigned char *) &temp, 2);
     }
 
 i++;
-}
+} */
 
         display_draw();
 
@@ -338,6 +393,9 @@ int binary(int value1, int position){
     else a=0;
     return a;
 }
+
+
+
 
 
 
